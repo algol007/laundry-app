@@ -1,103 +1,135 @@
 import {
   Flex,
   Box,
-  FormControl,
-  FormLabel,
-  Input,
-  InputGroup,
-  HStack,
-  InputRightElement,
   Stack,
-  Button,
   Heading,
   Text,
-  useColorModeValue,
-  Link,
+  Card,
+  CardHeader,
+  CardBody,
+  StackDivider,
+  Select,
+  useToast,
 } from '@chakra-ui/react';
-import { useState } from 'react';
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
+import { DefaultLayout } from '@/layouts';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Bar } from 'react-chartjs-2';
+import { useCallback, useEffect, useState } from 'react';
+import reportService, { ProductReportResult } from '@/services/reportService';
 
-export default function SignupCard() {
-  const [showPassword, setShowPassword] = useState(false);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+export const options = {
+  responsive: true,
+  plugins: {
+    legend: false,
+    title: false,
+  },
+};
+
+function HomePage() {
+  const toast = useToast();
+  const [reports, setReports] = useState<ProductReportResult[]>([]);
+
+  const fetchProductReport = useCallback(() => {
+    return reportService
+      .getProductReport()
+      .then((res) => {
+        setReports(res);
+      })
+      .catch((err) => {
+        toast({
+          description: err.message,
+          status: 'error',
+        });
+      });
+  }, []);
+
+  useEffect(() => {
+    fetchProductReport();
+  }, []);
+
+  const data = {
+    labels: reports.map((data) => data.created_at),
+    datasets: [
+      {
+        data: reports.map((data) => data.total),
+        backgroundColor: '#B2C5D4',
+      },
+    ],
+  };
 
   return (
-    <Flex
-      minH={'100vh'}
-      align={'center'}
-      justify={'center'}
-      bg={useColorModeValue('gray.50', 'gray.800')}
-    >
-      <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
-        <Stack align={'center'}>
-          <Heading fontSize={'4xl'} textAlign={'center'}>
-            Sign up
-          </Heading>
-          <Text fontSize={'lg'} color={'gray.600'}>
-            to enjoy all of our cool features ✌️
-          </Text>
-        </Stack>
-        <Box
-          rounded={'lg'}
-          bg={useColorModeValue('white', 'gray.700')}
-          boxShadow={'lg'}
-          p={8}
-        >
-          <Stack spacing={4}>
-            <HStack>
+    <DefaultLayout>
+      <Card mb={4}>
+        <CardHeader>
+          <Flex align={'center'} justify={'space-between'}>
+            <Heading size='md'>Product Sold</Heading>
+            <Box>
+              <Select>
+                <option value='option1'>This week</option>
+              </Select>
+            </Box>
+          </Flex>
+        </CardHeader>
+
+        <CardBody>
+          {/* @ts-ignore */}
+          <Bar options={options} data={data} />
+        </CardBody>
+      </Card>
+
+      <Box maxW='sm'>
+        <Card>
+          <CardHeader>
+            <Flex align={'center'} justify={'space-between'}>
+              <Heading size='md'>Top Selling Products</Heading>
               <Box>
-                <FormControl id='firstName' isRequired>
-                  <FormLabel>First Name</FormLabel>
-                  <Input type='text' />
-                </FormControl>
+                <Select>
+                  <option value='option1'>This week</option>
+                </Select>
+              </Box>
+            </Flex>
+          </CardHeader>
+
+          <CardBody>
+            <Stack divider={<StackDivider />} spacing='4'>
+              <Box>
+                <Text pt='2' fontSize='sm'>
+                  View a summary of all your clients over the last month.
+                </Text>
               </Box>
               <Box>
-                <FormControl id='lastName'>
-                  <FormLabel>Last Name</FormLabel>
-                  <Input type='text' />
-                </FormControl>
+                <Text pt='2' fontSize='sm'>
+                  Check out the overview of your clients.
+                </Text>
               </Box>
-            </HStack>
-            <FormControl id='email' isRequired>
-              <FormLabel>Email address</FormLabel>
-              <Input type='email' />
-            </FormControl>
-            <FormControl id='password' isRequired>
-              <FormLabel>Password</FormLabel>
-              <InputGroup>
-                <Input type={showPassword ? 'text' : 'password'} />
-                <InputRightElement h={'full'}>
-                  <Button
-                    variant={'ghost'}
-                    onClick={() =>
-                      setShowPassword((showPassword) => !showPassword)
-                    }
-                  >
-                    {showPassword ? <ViewIcon /> : <ViewOffIcon />}
-                  </Button>
-                </InputRightElement>
-              </InputGroup>
-            </FormControl>
-            <Stack spacing={10} pt={2}>
-              <Button
-                loadingText='Submitting'
-                size='lg'
-                bg={'blue.400'}
-                color={'white'}
-                _hover={{
-                  bg: 'blue.500',
-                }}
-              >
-                Sign up
-              </Button>
+              <Box>
+                <Text pt='2' fontSize='sm'>
+                  See a detailed analysis of all your business clients.
+                </Text>
+              </Box>
             </Stack>
-            <Stack pt={6}>
-              <Text align={'center'}>
-                Already a user? <Link color={'blue.400'}>Login</Link>
-              </Text>
-            </Stack>
-          </Stack>
-        </Box>
-      </Stack>
-    </Flex>
+          </CardBody>
+        </Card>
+      </Box>
+    </DefaultLayout>
   );
 }
+
+export default HomePage;
