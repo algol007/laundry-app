@@ -1,6 +1,6 @@
 import { setAxiosToken } from '@/libs/httpClient';
 import { tokenStorage } from '@/libs/tokenStorage';
-import authService, { LoginPayload } from '@/services/authService';
+import authService, { RegisterPayload } from '@/services/authService';
 import {
   Flex,
   Box,
@@ -26,17 +26,22 @@ function LoginPage() {
 
   const [show, setShow] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [loginForm, setLoginForm] = useState<LoginPayload>({
+  const [registerForm, setRegisterForm] = useState<RegisterPayload>({
+    name: '',
+    phone: '',
     email: '',
     password: '',
+    image_url:
+      'https://www.staialazharymamuju.ac.id/wp-content/uploads/2023/01/no-image.jpg',
   });
 
   const handleSubmitLogin = () => {
     let error = false;
+    setIsLoading(true);
 
-    Object.keys(loginForm).map(function (key) {
+    Object.keys(registerForm).map(function (key) {
       //@ts-ignore
-      if (loginForm[key] === '') {
+      if (registerForm[key] === '') {
         error = true;
         return;
       }
@@ -50,8 +55,7 @@ function LoginPage() {
       return;
     }
 
-    setIsLoading(true);
-    authService.login(loginForm).then((res) => {
+    authService.register(registerForm).then((res) => {
       toast({
         description: res.message,
         status: res.status ? 'success' : 'error',
@@ -61,7 +65,7 @@ function LoginPage() {
       if (res.status) {
         setAxiosToken(res.response);
         tokenStorage.store(res.response);
-        navigate('/dashboard');
+        navigate('/login');
       }
     });
   };
@@ -79,7 +83,7 @@ function LoginPage() {
             Be Laundry
           </Heading>
           <Text fontSize={'lg'} color={'gray.600'}>
-            Login Page
+            Register Page
           </Text>
         </Stack>
         <Box
@@ -89,17 +93,43 @@ function LoginPage() {
           p={8}
         >
           <Stack spacing={4}>
+            <FormControl isRequired id='name'>
+              <FormLabel>Full name</FormLabel>
+              <Input
+                type='text'
+                onChange={(e) =>
+                  setRegisterForm({
+                    ...registerForm,
+                    name: e.target.value,
+                  })
+                }
+                placeholder='Full name'
+              />
+            </FormControl>
             <FormControl isRequired id='email'>
               <FormLabel>Email address</FormLabel>
               <Input
                 type='email'
                 onChange={(e) =>
-                  setLoginForm({
-                    ...loginForm,
+                  setRegisterForm({
+                    ...registerForm,
                     email: e.target.value,
                   })
                 }
                 placeholder='Email address'
+              />
+            </FormControl>
+            <FormControl isRequired id='phone'>
+              <FormLabel>Phone number</FormLabel>
+              <Input
+                type='number'
+                onChange={(e) =>
+                  setRegisterForm({
+                    ...registerForm,
+                    phone: e.target.value,
+                  })
+                }
+                placeholder='Phone number'
               />
             </FormControl>
             <FormControl isRequired id='password' mb='7.5%'>
@@ -109,8 +139,8 @@ function LoginPage() {
                   pr='4.5rem'
                   type={show ? 'text' : 'password'}
                   onChange={(e) =>
-                    setLoginForm({
-                      ...loginForm,
+                    setRegisterForm({
+                      ...registerForm,
                       password: e.target.value,
                     })
                   }
@@ -123,7 +153,6 @@ function LoginPage() {
                 </InputRightElement>
               </InputGroup>
             </FormControl>
-
             <Stack spacing={10}>
               <Button
                 bg={'blue.400'}
@@ -133,14 +162,14 @@ function LoginPage() {
                 }}
                 onClick={handleSubmitLogin}
               >
-                {isLoading ? <Spinner /> : 'Login'}
+                {isLoading ? <Spinner /> : 'Register'}
               </Button>
             </Stack>
 
             <Flex justify='center' gap={2}>
-              <Text>Not a member?</Text>
+              <Text>Already a member?</Text>
               <Text color='brand.500'>
-                <Link to='/register'>Register now</Link>
+                <Link to='/login'>Login</Link>
               </Text>
             </Flex>
           </Stack>
