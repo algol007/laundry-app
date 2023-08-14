@@ -19,17 +19,12 @@ import {
   useToast,
   Radio,
   RadioGroup,
-  Spinner,
 } from '@chakra-ui/react';
 import { useCallback, useEffect, useState } from 'react';
 import { defaultProductPayload } from '../constant';
-import { useNavigate } from 'react-router-dom';
 
-function AddNewProductPage() {
+function EditProductPage() {
   const toast = useToast();
-  const navigate = useNavigate();
-
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [payload, setPayload] = useState<ProductPayload>(defaultProductPayload);
   const [categories, setCategories] = useState<Category[]>([]);
 
@@ -38,21 +33,17 @@ function AddNewProductPage() {
   };
 
   const handleSubmitProduct = () => {
-    setIsLoading(true);
     productService
       .createNewProduct(payload)
       .then((res) => {
-        setIsLoading(false);
         toast({
           description: res.message,
           status: 'success',
         });
-        navigate('/product');
+
+        console.log(res);
       })
-      .catch((err) => {
-        console.log(err);
-        setIsLoading(false);
-      });
+      .catch((err) => console.log(err));
   };
 
   const fetchAllCategories = useCallback(() => {
@@ -169,7 +160,7 @@ function AddNewProductPage() {
                 w='7rem'
                 onClick={handleSubmitProduct}
               >
-                {isLoading ? <Spinner /> : 'Publish'}
+                Publish
               </Button>
             </Show>
           </Flex>
@@ -201,7 +192,7 @@ function AddNewProductPage() {
 
           <Show below='md'>
             <Button colorScheme='green' w='100%' onClick={handleSubmitProduct}>
-              {isLoading ? <Spinner /> : 'Publish'}
+              Publish
             </Button>
           </Show>
         </Box>
@@ -210,4 +201,4 @@ function AddNewProductPage() {
   );
 }
 
-export default AddNewProductPage;
+export default EditProductPage;

@@ -53,7 +53,7 @@ const NavItem = ({ icon, url, children, ...rest }: NavItemProps) => {
         role='group'
         cursor='pointer'
         _hover={{
-          bg: 'white',
+          bg: 'rgba(255, 255, 255, 0.5)',
           color: 'brand.500',
         }}
         color={location.pathname === url ? 'brand.500' : 'white'}

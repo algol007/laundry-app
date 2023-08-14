@@ -1,31 +1,88 @@
+import { DefaultImage, DefaultModal } from '@/components';
 import { DefaultLayout } from '@/layouts';
 import { convertToRp } from '@/libs/convertToRp';
-import productService, { Product } from '@/services/productService';
 import { AddIcon, DeleteIcon, EditIcon, ViewIcon } from '@chakra-ui/icons';
 import {
   Button,
   Card,
   Flex,
-  IconButton,
-  Stack,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-  Tooltip,
-  TableCaption,
+  useDisclosure,
+  Text,
   Image,
+  Stack,
+  IconButton,
+  Tooltip,
 } from '@chakra-ui/react';
+import DataTable, { TableColumn } from 'react-data-table-component';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import productService, { Product } from '@/services/productService';
 
 function ProductListPage() {
   const navigate = useNavigate();
+  const { isOpen, onClose, onOpen } = useDisclosure();
 
   const [products, setProducts] = useState<Product[]>([]);
+  const [productSelected, setProductSelected] = useState<Product>();
+
+  const columns: TableColumn<Product>[] = [
+    {
+      name: 'SKU',
+      selector: (row) => row.sku,
+    },
+    {
+      name: 'Name',
+      selector: (row) => row.name,
+    },
+    {
+      name: 'Stock',
+      selector: (row) => row.stock,
+    },
+    {
+      name: 'Price',
+      selector: (row) => convertToRp(Number(row.price)),
+    },
+    {
+      name: 'Created At',
+      selector: (row) => row.created_at.slice(0, 10),
+    },
+    {
+      name: 'Action',
+      cell: (row) => (
+        <Stack direction='row'>
+          <Tooltip label='See product detail'>
+            <IconButton
+              onClick={() => navigate(`/product/${row.id}`)}
+              colorScheme='blue'
+              aria-label='See product detail'
+              icon={<ViewIcon />}
+            />
+          </Tooltip>
+          <Tooltip label='Edit product'>
+            <IconButton
+              colorScheme='yellow'
+              aria-label='Edit product'
+              icon={<EditIcon />}
+              onClick={() => {
+                navigate(`/product/${row.id}/edit`);
+              }}
+            />
+          </Tooltip>
+          <Tooltip label='Delete product'>
+            <IconButton
+              colorScheme='red'
+              aria-label='Delete product'
+              icon={<DeleteIcon />}
+              onClick={() => {
+                onOpen();
+                setProductSelected(row);
+              }}
+            />
+          </Tooltip>
+        </Stack>
+      ),
+    },
+  ];
 
   const fetchAllProducts = useCallback(() => {
     return productService
@@ -55,66 +112,14 @@ function ProductListPage() {
       </Flex>
 
       <Card>
-        <TableContainer>
-          <Table variant='simple'>
-            {products.length === 0 && (
-              <TableCaption color='gray.300' py='8'>
-                Product not found
-              </TableCaption>
-            )}
-            <Thead>
-              <Tr>
-                <Th>SKU</Th>
-                <Th>Name</Th>
-                <Th isNumeric>Stock</Th>
-                <Th>Price</Th>
-                <Th>Image</Th>
-                <Th>Action</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {products.length > 0 &&
-                products.map((data) => (
-                  <Tr key={data.id}>
-                    <Td>{data.sku}</Td>
-                    <Td>{data.name}</Td>
-                    <Td isNumeric>{data.stock}</Td>
-                    <Td>{convertToRp(data.price)}</Td>
-                    <Td>
-                      <Image src={data.image} />
-                    </Td>
-                    <Td>
-                      <Stack direction='row'>
-                        <Tooltip label='See product detail'>
-                          <IconButton
-                            onClick={() => navigate(`/product/${data.id}`)}
-                            colorScheme='blue'
-                            aria-label='See product detail'
-                            icon={<ViewIcon />}
-                          />
-                        </Tooltip>
-                        <Tooltip label='Edit product'>
-                          <IconButton
-                            colorScheme='yellow'
-                            aria-label='Edit product'
-                            icon={<EditIcon />}
-                          />
-                        </Tooltip>
-                        <Tooltip label='Delete product'>
-                          <IconButton
-                            colorScheme='red'
-                            aria-label='Delete product'
-                            icon={<DeleteIcon />}
-                          />
-                        </Tooltip>
-                      </Stack>
-                    </Td>
-                  </Tr>
-                ))}
-            </Tbody>
-          </Table>
-        </TableContainer>
+        <DataTable columns={columns} data={products} pagination />
       </Card>
+      <DefaultModal title='Delete product' isOpen={isOpen} onClose={onClose}>
+        <Text fontSize='2xl'>
+          Are you sure to delete{' '}
+          <Text fontWeight='bold'>{productSelected?.name}?</Text>
+        </Text>
+      </DefaultModal>
     </DefaultLayout>
   );
 }
