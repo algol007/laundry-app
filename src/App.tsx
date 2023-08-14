@@ -9,7 +9,7 @@ import {
 } from './modules/Products';
 import { SettingPage } from './modules/Settings';
 import { SalesPage } from './modules/Sales';
-import { LoginPage } from './modules/Auth';
+import { LoginPage, RegisterPage } from './modules/Auth';
 import { DashboardPage } from './modules/Dashboard';
 
 const App = () => {
@@ -17,8 +17,9 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<HomePage />} />
-        <Route path='/dashboard' element={<DashboardPage />} />
+        <Route path='/register' element={<RegisterPage />} />
         <Route path='/login' element={<LoginPage />} />
+        <Route path='/dashboard' element={<DashboardPage />} />
         <Route path='/create-product' element={<AddNewProductPage />} />
         <Route path='/product' element={<ProductListPage />} />
         <Route path='/product/:id' element={<ProductDetailPage />} />
