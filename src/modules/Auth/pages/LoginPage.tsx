@@ -78,6 +78,7 @@ function LoginPage() {
                     email: e.target.value,
                   })
                 }
+                placeholder='Email address'
               />
             </FormControl>
             <FormControl id='password' mb='7.5%'>
@@ -92,6 +93,7 @@ function LoginPage() {
                       password: e.target.value,
                     })
                   }
+                  placeholder='Password'
                 />
                 <InputRightElement width='4.5rem'>
                   <Button h='1.75rem' size='sm' onClick={() => setShow(!show)}>

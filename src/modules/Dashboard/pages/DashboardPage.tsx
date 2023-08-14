@@ -24,6 +24,7 @@ import {
 import { Bar } from 'react-chartjs-2';
 import { useCallback, useEffect, useState } from 'react';
 import reportService, { ProductReportResult } from '@/services/reportService';
+import { faker } from '@faker-js/faker';
 
 ChartJS.register(
   CategoryScale,
@@ -44,7 +45,9 @@ export const options = {
 
 function DashboardPage() {
   const toast = useToast();
+
   const [reports, setReports] = useState<ProductReportResult[]>([]);
+  const topSelling: number[] = [1, 2, 3];
 
   const fetchProductReport = useCallback(() => {
     return reportService
@@ -65,10 +68,10 @@ function DashboardPage() {
   }, []);
 
   const data = {
-    labels: reports.map((data) => data.created_at),
+    labels: reports?.map((data) => data.created_at),
     datasets: [
       {
-        data: reports.map((data) => data.total),
+        data: reports?.map((data) => data.total),
         backgroundColor: '#B2C5D4',
       },
     ],
@@ -109,21 +112,16 @@ function DashboardPage() {
 
           <CardBody>
             <Stack divider={<StackDivider />} spacing='4'>
-              <Box>
-                <Text pt='2' fontSize='sm'>
-                  View a summary of all your clients over the last month.
-                </Text>
-              </Box>
-              <Box>
-                <Text pt='2' fontSize='sm'>
-                  Check out the overview of your clients.
-                </Text>
-              </Box>
-              <Box>
-                <Text pt='2' fontSize='sm'>
-                  See a detailed analysis of all your business clients.
-                </Text>
-              </Box>
+              {topSelling.map((data) => (
+                <Flex justify='space-between' key={data}>
+                  <Text pt='2' fontSize='sm'>
+                    {faker.commerce.product()}
+                  </Text>
+                  <Text pt='2' fontSize='sm' fontWeight='bold'>
+                    {faker.number.int(100)}
+                  </Text>
+                </Flex>
+              ))}
             </Stack>
           </CardBody>
         </Card>
