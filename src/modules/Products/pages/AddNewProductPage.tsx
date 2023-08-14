@@ -138,7 +138,7 @@ function AddNewProductPage() {
             <RadioGroup
               onChange={(val) => handleChangePayload('category_id', val)}
             >
-              <Stack direction='row' gap={4}>
+              <Stack direction={['column', 'row']} gap={4}>
                 {categories.length > 0 &&
                   categories.map((data) => (
                     <Radio key={data.id} value={`${data.id}`}>

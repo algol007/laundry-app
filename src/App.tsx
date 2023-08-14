@@ -10,12 +10,14 @@ import {
 import { SettingPage } from './modules/Settings';
 import { SalesPage } from './modules/Sales';
 import { LoginPage } from './modules/Auth';
+import { DashboardPage } from './modules/Dashboard';
 
 const App = () => {
   return (
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<HomePage />} />
+        <Route path='/dashboard' element={<DashboardPage />} />
         <Route path='/login' element={<LoginPage />} />
         <Route path='/create-product' element={<AddNewProductPage />} />
         <Route path='/product' element={<ProductListPage />} />
