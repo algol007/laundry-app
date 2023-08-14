@@ -8,12 +8,17 @@ import {
 import { Navbar, Sidebar } from '..';
 import { useCallback, useEffect, useState } from 'react';
 import userService from '@/services/userService';
+import { tokenStorage } from '@/libs/tokenStorage';
+import { useNavigate } from 'react-router-dom';
 
 type DefaultLayoutProps = {
   children: React.ReactNode;
 };
 
 const DefaultLayout = ({ children }: DefaultLayoutProps) => {
+  const navigate = useNavigate();
+  const token = tokenStorage.get();
+
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [name, setName] = useState<string>('');
 
@@ -29,6 +34,9 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
   }, []);
 
   useEffect(() => {
+    if (!token) {
+      navigate('/login');
+    }
     fetchUserInfo();
   }, []);
 
