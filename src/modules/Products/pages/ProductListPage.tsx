@@ -14,7 +14,6 @@ import {
   useToast,
   ModalFooter,
   Spinner,
-  Box,
 } from '@chakra-ui/react';
 import DataTable, { TableColumn } from 'react-data-table-component';
 import { useCallback, useEffect, useState } from 'react';

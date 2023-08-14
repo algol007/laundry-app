@@ -41,7 +41,7 @@ function LoginPage() {
       setAxiosToken(res.response);
       tokenStorage.store(res.response);
       setIsLoading(false);
-      navigate('/');
+      navigate('/dashboard');
     });
   };
 
