@@ -26,7 +26,7 @@ export default function Simple() {
 
   const [product, setProduct] = useState<Product>();
 
-  const fetchProduct = useCallback(() => {
+  const fetchProductDetail = useCallback(() => {
     return productService
       .getProductDetail(Number(params.id))
       .then((res) => {
@@ -38,7 +38,7 @@ export default function Simple() {
   }, []);
 
   useEffect(() => {
-    fetchProduct();
+    fetchProductDetail();
   }, [params]);
 
   return (

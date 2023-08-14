@@ -19,12 +19,19 @@ import {
   useToast,
   Radio,
   RadioGroup,
+  Spinner,
 } from '@chakra-ui/react';
 import { useCallback, useEffect, useState } from 'react';
 import { defaultProductPayload } from '../constant';
+import { useNavigate, useParams } from 'react-router-dom';
+import { DefaultImage } from '@/components';
 
 function EditProductPage() {
+  const navigate = useNavigate();
   const toast = useToast();
+  const params = useParams();
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [payload, setPayload] = useState<ProductPayload>(defaultProductPayload);
   const [categories, setCategories] = useState<Category[]>([]);
 
@@ -33,15 +40,16 @@ function EditProductPage() {
   };
 
   const handleSubmitProduct = () => {
+    setIsLoading(true);
     productService
-      .createNewProduct(payload)
+      .updateProduct(Number(params.id), payload)
       .then((res) => {
         toast({
           description: res.message,
           status: 'success',
         });
-
-        console.log(res);
+        setIsLoading(false);
+        navigate('/product');
       })
       .catch((err) => console.log(err));
   };
@@ -57,16 +65,36 @@ function EditProductPage() {
       });
   }, []);
 
-  useEffect(() => {
-    fetchAllCategories();
+  const fetchProductDetail = useCallback(() => {
+    return productService
+      .getProductDetail(Number(params.id))
+      .then((res) => {
+        setPayload({
+          name: res.response.name,
+          description: res.response.description,
+          sku: res.response.sku,
+          stock: res.response.stock,
+          category_id: res.response.category_id,
+          price: res.response.price,
+          image: res.response.image,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, []);
+
+  useEffect(() => {
+    fetchProductDetail();
+    fetchAllCategories();
+  }, [params]);
 
   return (
     <DefaultLayout>
       <Flex direction={['column', 'row']}>
         <Box w={['100%', '67%']} mr='2%'>
           <Heading w='100%' textAlign={'left'} fontWeight='bold' mb='5%'>
-            Add New Product
+            Edit Product
           </Heading>
           <FormControl mb='3%'>
             <FormLabel htmlFor='name' color='brand.500'>
@@ -78,6 +106,7 @@ function EditProductPage() {
               placeholder='Product Name'
               background='white'
               onChange={(e) => handleChangePayload('name', e.target.value)}
+              defaultValue={payload?.name}
             />
           </FormControl>
 
@@ -92,6 +121,7 @@ function EditProductPage() {
               onChange={(e) =>
                 handleChangePayload('description', e.target.value)
               }
+              defaultValue={payload?.description}
             />
           </FormControl>
 
@@ -105,6 +135,7 @@ function EditProductPage() {
                 placeholder='SKU'
                 background='white'
                 onChange={(e) => handleChangePayload('sku', e.target.value)}
+                defaultValue={payload?.sku}
               />
             </FormControl>
 
@@ -117,6 +148,7 @@ function EditProductPage() {
                 placeholder='Stock'
                 background='white'
                 onChange={(e) => handleChangePayload('stock', e.target.value)}
+                defaultValue={payload?.stock}
               />
             </FormControl>
           </Flex>
@@ -128,11 +160,12 @@ function EditProductPage() {
 
             <RadioGroup
               onChange={(val) => handleChangePayload('category_id', val)}
+              defaultValue={payload?.category_id}
             >
               <Stack direction='row' gap={4}>
                 {categories.length > 0 &&
                   categories.map((data) => (
-                    <Radio key={data.id} value={`${data.id}`}>
+                    <Radio key={data.id} defaultValue={`${data.id}`}>
                       {data.name}
                     </Radio>
                   ))}
@@ -151,6 +184,7 @@ function EditProductPage() {
                 background='white'
                 type='number'
                 onChange={(e) => handleChangePayload('price', e.target.value)}
+                defaultValue={payload?.price}
               />
             </FormControl>
 
@@ -160,7 +194,7 @@ function EditProductPage() {
                 w='7rem'
                 onClick={handleSubmitProduct}
               >
-                Publish
+                {isLoading ? <Spinner /> : 'Publish'}
               </Button>
             </Show>
           </Flex>
@@ -180,10 +214,11 @@ function EditProductPage() {
                 top='0'
                 left='0'
               />
-              <Image
-                src='https://www.staialazharymamuju.ac.id/wp-content/uploads/2023/01/no-image.jpg'
-                alt='image'
-              />
+              {payload?.image ? (
+                <Image src={payload.image} alt='image' />
+              ) : (
+                <DefaultImage />
+              )}
               <Text align='center' decoration='underline' fontWeight='bold'>
                 Upload image here
               </Text>
@@ -192,7 +227,7 @@ function EditProductPage() {
 
           <Show below='md'>
             <Button colorScheme='green' w='100%' onClick={handleSubmitProduct}>
-              Publish
+              {isLoading ? <Spinner /> : 'Publish'}
             </Button>
           </Show>
         </Box>
