@@ -11,7 +11,7 @@ export type ProductPayload = {
   description: string;
   sku: string;
   stock: number;
-  category_id: number | null;
+  category_id?: string;
   price: number;
   image: string;
 }
@@ -46,8 +46,14 @@ const productService = {
   getProductDetail(id: number): Promise<GetProductResult> {
     return httpClient.get(`/product/${id}`);
   },
+  deleteProduct(id: number): Promise<GetProductResult> {
+    return httpClient.delete(`/product/${id}`);
+  },
   createNewProduct(payload: ProductPayload): Promise<GeneralResponse> {
     return httpClient.post('/product', payload);
+  },
+  updateProduct(id: number, payload: ProductPayload): Promise<GeneralResponse> {
+    return httpClient.put(`/product/${id}`, payload);
   }
 }
 

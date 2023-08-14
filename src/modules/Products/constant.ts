@@ -5,7 +5,7 @@ export const defaultProductPayload: ProductPayload = {
   description: '',
   sku: '',
   stock: 0,
-  category_id: null,
+  category_id: '',
   price: 0,
   image: '',
 }

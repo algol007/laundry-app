@@ -1,10 +1,8 @@
 import {
-  Button,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalFooter,
   ModalHeader,
   ModalOverlay,
 } from '@chakra-ui/react';
@@ -24,15 +22,6 @@ function DefaultModal({ title, children, isOpen, onClose }: ModalProps) {
         <ModalHeader>{title}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>{children}</ModalBody>
-
-        <ModalFooter>
-          <Button mr={3} onClick={onClose}>
-            Cancel
-          </Button>
-          <Button variant='ghost' color='red.500'>
-            Delete
-          </Button>
-        </ModalFooter>
       </ModalContent>
     </Modal>
   );
